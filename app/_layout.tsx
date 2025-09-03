@@ -17,7 +17,7 @@ export default function RootLayout() {
         <Stack.Screen name="index" />
         <Stack.Screen name="onboarding" />
         <Stack.Screen name="landing" />
-        <Stack.Screen name="auth" />
+        <Stack.Screen name="auth/login" />
         <Stack.Screen name="(authenticated)" />
       </Stack>
       <StatusBar style="auto" />

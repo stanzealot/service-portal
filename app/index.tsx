@@ -4,7 +4,7 @@ import LoadingScreen from '../components/common/LoadingScreen';
 import { useAuthStore } from '../store/authStore';
 
 export default function AppIndex() {
-  const { isFirstLaunch } = useAuthStore();
+  const { isAuthenticated, isFirstLaunch } = useAuthStore();
   const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
@@ -20,16 +20,20 @@ export default function AppIndex() {
     if (!isLoading) {
       if (isFirstLaunch) {
         router.push('/onboarding');
+      } else if (!isAuthenticated) {
+        router.push('/landing');
+      } else {
+        router.push('/(authenticated)/dashboard');
       }
       // We'll add other routes later
     }
-  }, [isLoading, isFirstLaunch]);
+  }, [isLoading, isFirstLaunch, isAuthenticated]);
 
   if (isLoading) {
     return <LoadingScreen />;
   }
 
   // For now, always show onboarding to test
-  router.push('/onboarding');
+  //   router.push('/onboarding');
   return <LoadingScreen />;
 }

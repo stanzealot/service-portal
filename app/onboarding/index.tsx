@@ -1,4 +1,5 @@
 import { LinearGradient } from 'expo-linear-gradient';
+import { router } from 'expo-router';
 import React, { useRef, useState } from 'react';
 import {
   Animated,
@@ -81,8 +82,9 @@ export default function OnboardingScreen() {
 
   const handleGetStarted = () => {
     setFirstLaunch(false);
+    router.push('/landing');
     // For now, just show an alert since we haven't built auth yet
-    alert('Onboarding complete! 🎉\n\nNext: Login screen will be implemented');
+    // alert('Onboarding complete! 🎉\n\nNext: Login screen will be implemented');
   };
 
   // Create interpolated styles for animations
