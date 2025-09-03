@@ -1,17 +1,8 @@
-// components/animations/RotatingImageCarousel.tsx - Correct Implementation
-import { LinearGradient } from 'expo-linear-gradient';
 import React, { useEffect, useRef } from 'react';
-import {
-  Animated,
-  Dimensions,
-  Image,
-  StyleSheet,
-  Text,
-  View,
-} from 'react-native';
+import { Animated, Dimensions, Image, StyleSheet, View } from 'react-native';
 
 const { width: SCREEN_WIDTH } = Dimensions.get('window');
-const CIRCLE_SIZE = 300;
+const CIRCLE_SIZE = 400;
 
 interface RotatingImageCarouselProps {
   image: any;
@@ -96,14 +87,11 @@ const RotatingImageCarousel: React.FC<RotatingImageCarouselProps> = ({
 
         {/* Center logo - STATIC, doesn't rotate */}
         <View style={styles.centerLogo}>
-          <LinearGradient
-            colors={['#FF4444', '#FF6B35']}
-            style={styles.logoGradient}
-            start={{ x: 0, y: 0 }}
-            end={{ x: 1, y: 1 }}
-          >
-            <Text style={styles.logoText}>LFZ</Text>
-          </LinearGradient>
+          <Image
+            source={require('../../assets/logo.png')} // Your logo file
+            style={styles.logoImage}
+            resizeMode="contain"
+          />
         </View>
       </Animated.View>
     </View>
@@ -162,6 +150,10 @@ const styles = StyleSheet.create({
     fontWeight: '900',
     color: '#FFFFFF',
     letterSpacing: 1,
+  },
+  logoImage: {
+    width: 70,
+    height: 70,
   },
 });
 
