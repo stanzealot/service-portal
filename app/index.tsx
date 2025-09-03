@@ -23,7 +23,8 @@ export default function AppIndex() {
       } else if (!isAuthenticated) {
         router.push('/landing');
       } else {
-        router.push('/(authenticated)/dashboard');
+        router.push('/landing');
+        // router.push('/(authenticated)/dashboard');
       }
       // We'll add other routes later
     }

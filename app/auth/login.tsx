@@ -1,4 +1,4 @@
-// app/auth/login.tsx - Exact UI Match
+// app/auth/login.tsx - Exact Design Match with Custom Border Radius
 import { Ionicons } from '@expo/vector-icons';
 import { router } from 'expo-router';
 import React, { useEffect, useRef, useState } from 'react';
@@ -11,6 +11,7 @@ import {
   Platform,
   Pressable,
   SafeAreaView,
+  ScrollView,
   StatusBar,
   StyleSheet,
   Text,
@@ -20,6 +21,10 @@ import {
 import { useAuthStore } from '../../store/authStore';
 
 const { width: SCREEN_WIDTH, height: SCREEN_HEIGHT } = Dimensions.get('window');
+
+// Calculate responsive dimensions
+const TOP_SECTION_HEIGHT = SCREEN_HEIGHT - 576; // Dynamic top section
+const WHITE_SECTION_HEIGHT = 576; // Fixed white section height
 
 export default function LoginScreen() {
   const [formData, setFormData] = useState({
@@ -37,6 +42,10 @@ export default function LoginScreen() {
   const slideAnim = useRef(new Animated.Value(30)).current;
   const rippleAnim = useRef(new Animated.Value(0)).current;
   const biometricPulse = useRef(new Animated.Value(1)).current;
+
+  // Wave animations for background ellipses
+  const waveAnim1 = useRef(new Animated.Value(0)).current;
+  const waveAnim2 = useRef(new Animated.Value(0)).current;
 
   useEffect(() => {
     // Entry animation
@@ -69,6 +78,23 @@ export default function LoginScreen() {
         }),
       ])
     ).start();
+
+    // Wave ripple animations
+    Animated.loop(
+      Animated.timing(waveAnim1, {
+        toValue: 1,
+        duration: 4000,
+        useNativeDriver: true,
+      })
+    ).start();
+
+    Animated.loop(
+      Animated.timing(waveAnim2, {
+        toValue: 1,
+        duration: 6000,
+        useNativeDriver: true,
+      })
+    ).start();
   }, []);
 
   const handleLogin = async () => {
@@ -79,7 +105,6 @@ export default function LoginScreen() {
 
     setLoading(true);
 
-    // Ripple effect
     rippleAnim.setValue(0);
     Animated.timing(rippleAnim, {
       toValue: 1,
@@ -87,7 +112,6 @@ export default function LoginScreen() {
       useNativeDriver: true,
     }).start();
 
-    // Simulate login
     setTimeout(() => {
       const mockUser = {
         id: '1',
@@ -98,14 +122,13 @@ export default function LoginScreen() {
 
       login(mockUser, 'mock_token');
       setLoading(false);
-      router.push('/(authenticated)/dashboard');
+      router.push('/(authenticated)/dashboard' as any);
     }, 2000);
   };
 
   const handleBiometric = () => {
     setShowBiometricModal(true);
 
-    // Simulate biometric authentication
     setTimeout(() => {
       setShowBiometricModal(false);
       const mockUser = {
@@ -115,7 +138,7 @@ export default function LoginScreen() {
         role: 'user',
       };
       login(mockUser, 'biometric_token');
-      router.push('/(authenticated)/dashboard');
+      router.push('/(authenticated)/dashboard' as any);
     }, 2500);
   };
 
@@ -129,6 +152,27 @@ export default function LoginScreen() {
     outputRange: [0.3, 0],
   });
 
+  // Wave animations
+  const wave1Scale = waveAnim1.interpolate({
+    inputRange: [0, 0.5, 1],
+    outputRange: [1, 1.2, 1],
+  });
+
+  const wave1Opacity = waveAnim1.interpolate({
+    inputRange: [0, 0.5, 1],
+    outputRange: [0.3, 0.6, 0.3],
+  });
+
+  const wave2Scale = waveAnim2.interpolate({
+    inputRange: [0, 0.5, 1],
+    outputRange: [1, 1.15, 1],
+  });
+
+  const wave2Opacity = waveAnim2.interpolate({
+    inputRange: [0, 0.5, 1],
+    outputRange: [0.4, 0.7, 0.4],
+  });
+
   return (
     <SafeAreaView style={styles.container}>
       <StatusBar barStyle="light-content" backgroundColor="#000F29" />
@@ -137,12 +181,48 @@ export default function LoginScreen() {
         behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
         style={styles.keyboardAvoid}
       >
-        {/* Top Section - Dark Blue */}
-        <View style={styles.topSection}>
-          {/* Animated background waves */}
-          <View style={styles.backgroundWaves}>
-            <Animated.View style={[styles.wave, styles.wave1]} />
-            <Animated.View style={[styles.wave, styles.wave2]} />
+        {/* Blue Background Section - Full screen */}
+        <View style={styles.blueBackground}>
+          {/* Background Ellipses with Wave Animation */}
+          <View style={styles.backgroundEllipses}>
+            {/* Top-left ellipse */}
+            <Animated.View
+              style={[
+                styles.ellipse,
+                styles.ellipse1,
+                {
+                  transform: [{ scale: wave1Scale }],
+                  opacity: wave1Opacity,
+                },
+              ]}
+            />
+
+            {/* Right-center ellipse */}
+            <Animated.View
+              style={[
+                styles.ellipse,
+                styles.ellipse2,
+                {
+                  transform: [{ scale: wave2Scale }],
+                  opacity: wave2Opacity,
+                },
+              ]}
+            />
+
+            {/* Additional subtle ellipses */}
+            <Animated.View
+              style={[
+                styles.ellipse,
+                styles.ellipse3,
+                {
+                  transform: [{ scale: wave1Scale }],
+                  opacity: waveAnim1.interpolate({
+                    inputRange: [0, 0.5, 1],
+                    outputRange: [0.15, 0.3, 0.15],
+                  }),
+                },
+              ]}
+            />
           </View>
 
           {/* Logo */}
@@ -163,119 +243,126 @@ export default function LoginScreen() {
           </Animated.View>
         </View>
 
-        {/* Bottom Section - White with Curve */}
+        {/* White Section with Custom Border Radius */}
         <Animated.View
           style={[
-            styles.bottomSection,
+            styles.whiteSection,
             {
               opacity: fadeAnim,
-              transform: [{ translateY: slideAnim }],
             },
           ]}
         >
-          <View style={styles.formContainer}>
-            <Text style={styles.welcomeTitle}>Welcome to One Portal</Text>
+          <ScrollView
+            contentContainerStyle={styles.scrollContent}
+            showsVerticalScrollIndicator={false}
+            bounces={false}
+          >
+            <View style={styles.formContainer}>
+              <Text style={styles.welcomeTitle}>Welcome to One Portal</Text>
 
-            {/* Email Input */}
-            <View style={styles.inputGroup}>
-              <Text style={styles.inputLabel}>Email</Text>
-              <TextInput
-                style={[
-                  styles.textInput,
-                  formData.email && styles.textInputFocused,
-                ]}
-                placeholder="Enter your email"
-                placeholderTextColor="#999"
-                value={formData.email}
-                onChangeText={(text) =>
-                  setFormData((prev) => ({ ...prev, email: text }))
-                }
-                keyboardType="email-address"
-                autoCapitalize="none"
-                autoCorrect={false}
-              />
-            </View>
-
-            {/* Password Input */}
-            <View style={styles.inputGroup}>
-              <Text style={styles.inputLabel}>Password</Text>
-              <View style={styles.passwordContainer}>
+              {/* Email Input */}
+              <View style={styles.inputGroup}>
+                <Text style={styles.inputLabel}>Email</Text>
                 <TextInput
                   style={[
-                    styles.passwordInput,
-                    formData.password && styles.textInputFocused,
+                    styles.textInput,
+                    formData.email && styles.textInputFocused,
                   ]}
-                  placeholder="Enter your Password"
+                  placeholder="Enter your email"
                   placeholderTextColor="#999"
-                  value={formData.password}
+                  value={formData.email}
                   onChangeText={(text) =>
-                    setFormData((prev) => ({ ...prev, password: text }))
+                    setFormData((prev) => ({ ...prev, email: text }))
                   }
-                  secureTextEntry={!showPassword}
+                  keyboardType="email-address"
                   autoCapitalize="none"
                   autoCorrect={false}
                 />
-                <Pressable
-                  onPress={() => setShowPassword(!showPassword)}
-                  style={styles.passwordToggle}
-                >
-                  <Ionicons
-                    name={showPassword ? 'eye' : 'eye-off'}
-                    size={20}
-                    color="#666"
-                  />
-                </Pressable>
               </View>
-            </View>
 
-            <Pressable style={styles.forgotPassword}>
-              <Text style={styles.forgotPasswordText}>Forgot Password?</Text>
-            </Pressable>
-
-            {/* Sign In Button with Ripple Effect */}
-            <Pressable
-              style={styles.signInButton}
-              onPress={handleLogin}
-              disabled={loading}
-            >
-              {/* Ripple Effect */}
-              <Animated.View
-                style={[
-                  styles.ripple,
-                  {
-                    transform: [{ scale: rippleScale }],
-                    opacity: rippleOpacity,
-                  },
-                ]}
-              />
-
-              {loading ? (
-                <View style={styles.loadingContainer}>
-                  <Animated.View style={styles.loadingDot} />
-                  <Animated.View
-                    style={[styles.loadingDot, { marginLeft: 8 }]}
+              {/* Password Input */}
+              <View style={styles.inputGroup}>
+                <Text style={styles.inputLabel}>Password</Text>
+                <View style={styles.passwordContainer}>
+                  <TextInput
+                    style={[
+                      styles.passwordInput,
+                      formData.password && styles.textInputFocused,
+                    ]}
+                    placeholder="Enter your Password"
+                    placeholderTextColor="#999"
+                    value={formData.password}
+                    onChangeText={(text) =>
+                      setFormData((prev) => ({ ...prev, password: text }))
+                    }
+                    secureTextEntry={!showPassword}
+                    autoCapitalize="none"
+                    autoCorrect={false}
                   />
-                  <Animated.View
-                    style={[styles.loadingDot, { marginLeft: 8 }]}
-                  />
+                  <Pressable
+                    onPress={() => setShowPassword(!showPassword)}
+                    style={styles.passwordToggle}
+                  >
+                    <Ionicons
+                      name={showPassword ? 'eye' : 'eye-off'}
+                      size={20}
+                      color="#666"
+                    />
+                  </Pressable>
                 </View>
-              ) : (
-                <Text style={styles.signInButtonText}>Sign In</Text>
-              )}
-            </Pressable>
+              </View>
 
-            {/* Biometric Button */}
-            <Pressable style={styles.biometricButton} onPress={handleBiometric}>
-              <Animated.View
-                style={[
-                  styles.biometricIcon,
-                  { transform: [{ scale: biometricPulse }] },
-                ]}
+              <Pressable style={styles.forgotPassword}>
+                <Text style={styles.forgotPasswordText}>Forgot Password?</Text>
+              </Pressable>
+
+              {/* Sign In Button with Ripple Effect */}
+              <Pressable
+                style={styles.signInButton}
+                onPress={handleLogin}
+                disabled={loading}
               >
-                <Ionicons name="finger-print" size={32} color="#666" />
-              </Animated.View>
-            </Pressable>
-          </View>
+                <Animated.View
+                  style={[
+                    styles.ripple,
+                    {
+                      transform: [{ scale: rippleScale }],
+                      opacity: rippleOpacity,
+                    },
+                  ]}
+                />
+
+                {loading ? (
+                  <View style={styles.loadingContainer}>
+                    <Animated.View style={styles.loadingDot} />
+                    <Animated.View
+                      style={[styles.loadingDot, { marginLeft: 8 }]}
+                    />
+                    <Animated.View
+                      style={[styles.loadingDot, { marginLeft: 8 }]}
+                    />
+                  </View>
+                ) : (
+                  <Text style={styles.signInButtonText}>Sign In</Text>
+                )}
+              </Pressable>
+
+              {/* Biometric Button */}
+              <Pressable
+                style={styles.biometricButton}
+                onPress={handleBiometric}
+              >
+                <Animated.View
+                  style={[
+                    styles.biometricIcon,
+                    { transform: [{ scale: biometricPulse }] },
+                  ]}
+                >
+                  <Ionicons name="finger-print" size={32} color="#666" />
+                </Animated.View>
+              </Pressable>
+            </View>
+          </ScrollView>
         </Animated.View>
       </KeyboardAvoidingView>
 
@@ -289,7 +376,6 @@ export default function LoginScreen() {
         <View style={styles.modalOverlay}>
           <View style={styles.biometricModal}>
             <View style={styles.modalContent}>
-              {/* Animated Loading Circle */}
               <View style={styles.loadingCircleContainer}>
                 <Animated.View style={styles.loadingCircle}>
                   <View style={styles.loadingSpinner} />
@@ -316,83 +402,109 @@ const styles = StyleSheet.create({
   keyboardAvoid: {
     flex: 1,
   },
-  topSection: {
-    height: SCREEN_HEIGHT * 0.35,
+  blueBackground: {
+    position: 'absolute',
+    top: 0,
+    left: 0,
+    right: 0,
+    bottom: 0,
     backgroundColor: '#000F29',
     justifyContent: 'center',
     alignItems: 'center',
-    position: 'relative',
     overflow: 'hidden',
   },
-  backgroundWaves: {
+  backgroundEllipses: {
     position: 'absolute',
     top: 0,
     left: 0,
     right: 0,
     bottom: 0,
   },
-  wave: {
+  ellipse: {
     position: 'absolute',
     borderRadius: 999,
-    backgroundColor: 'rgba(245, 31, 0, 0.06)',
+    backgroundColor: 'rgba(255, 255, 255, 0.03)',
+    borderWidth: 1,
+    borderColor: 'rgba(255, 255, 255, 0.05)',
   },
-  wave1: {
+  ellipse1: {
+    width: 400,
+    height: 400,
+    top: -200,
+    left: -150,
+  },
+  ellipse2: {
+    width: 300,
+    height: 300,
+    top: '30%',
+    right: -150,
+  },
+  ellipse3: {
     width: 200,
     height: 200,
-    top: -100,
-    right: -50,
-  },
-  wave2: {
-    width: 150,
-    height: 150,
-    bottom: -50,
-    left: -30,
+    bottom: 100,
+    left: -50,
   },
   logoContainer: {
     alignItems: 'center',
-    zIndex: 1,
+    zIndex: 10,
+    marginTop: -50, // Adjust for better positioning
   },
   logo: {
     width: 200,
     height: 80,
   },
-  bottomSection: {
-    flex: 1,
+  whiteSection: {
+    position: 'absolute',
+    bottom: 0,
+    left: 0,
+    right: 0,
+    height: WHITE_SECTION_HEIGHT,
     backgroundColor: '#FFFFFF',
-    borderTopLeftRadius: 32,
-    borderTopRightRadius: 32,
-    marginTop: -16,
+    // Custom border radius - key change!
+    borderTopLeftRadius: 0,
+    borderTopRightRadius: 137,
+    borderBottomLeftRadius: 0,
+    borderBottomRightRadius: 2,
+    // Additional styling for iOS shadow
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: -5 },
+    shadowOpacity: 0.1,
+    shadowRadius: 10,
+    elevation: 10,
+  },
+  scrollContent: {
+    flexGrow: 1,
   },
   formContainer: {
     padding: 32,
-    paddingTop: 40,
+    paddingTop: 48,
   },
   welcomeTitle: {
-    fontSize: 24,
+    fontSize: 28,
     fontWeight: '700',
     color: '#333',
-    marginBottom: 32,
+    marginBottom: 40,
     textAlign: 'center',
   },
   inputGroup: {
-    marginBottom: 20,
+    marginBottom: 24,
   },
   inputLabel: {
-    fontSize: 14,
+    fontSize: 16,
     fontWeight: '600',
     color: '#333',
-    marginBottom: 8,
+    marginBottom: 12,
   },
   textInput: {
-    height: 56,
-    borderRadius: 16,
-    borderWidth: 1.5,
+    height: 60,
+    borderRadius: 20,
+    borderWidth: 2,
     borderColor: '#E8E8E8',
     backgroundColor: '#FAFAFA',
-    paddingHorizontal: 16,
+    paddingHorizontal: 20,
     fontSize: 16,
     color: '#333',
-    // transition: 'all 0.2s ease',
   },
   textInputFocused: {
     borderColor: '#007AFF',
@@ -407,43 +519,43 @@ const styles = StyleSheet.create({
     position: 'relative',
   },
   passwordInput: {
-    height: 56,
-    borderRadius: 16,
-    borderWidth: 1.5,
+    height: 60,
+    borderRadius: 20,
+    borderWidth: 2,
     borderColor: '#E8E8E8',
     backgroundColor: '#FAFAFA',
-    paddingHorizontal: 16,
-    paddingRight: 50,
+    paddingHorizontal: 20,
+    paddingRight: 55,
     fontSize: 16,
     color: '#333',
   },
   passwordToggle: {
     position: 'absolute',
-    right: 16,
-    top: 18,
+    right: 20,
+    top: 20,
   },
   forgotPassword: {
     alignSelf: 'flex-end',
-    marginBottom: 32,
+    marginBottom: 40,
   },
   forgotPasswordText: {
-    fontSize: 14,
+    fontSize: 16,
     color: '#007AFF',
     fontWeight: '600',
   },
   signInButton: {
     backgroundColor: '#000F29',
-    borderRadius: 16,
-    paddingVertical: 18,
+    borderRadius: 20,
+    paddingVertical: 20,
     alignItems: 'center',
-    marginBottom: 32,
+    marginBottom: 40,
     position: 'relative',
     overflow: 'hidden',
     shadowColor: '#000F29',
-    shadowOffset: { width: 0, height: 4 },
+    shadowOffset: { width: 0, height: 6 },
     shadowOpacity: 0.2,
-    shadowRadius: 8,
-    elevation: 6,
+    shadowRadius: 10,
+    elevation: 8,
   },
   ripple: {
     position: 'absolute',
@@ -454,7 +566,7 @@ const styles = StyleSheet.create({
   },
   signInButtonText: {
     color: '#FFFFFF',
-    fontSize: 16,
+    fontSize: 18,
     fontWeight: '600',
     zIndex: 1,
   },
@@ -470,10 +582,10 @@ const styles = StyleSheet.create({
   },
   biometricButton: {
     alignItems: 'center',
-    paddingVertical: 16,
+    paddingVertical: 20,
   },
   biometricIcon: {
-    padding: 8,
+    padding: 12,
   },
   modalOverlay: {
     flex: 1,
