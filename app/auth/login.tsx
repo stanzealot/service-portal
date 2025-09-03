@@ -216,10 +216,7 @@ export default function LoginScreen() {
                 styles.ellipse3,
                 {
                   transform: [{ scale: wave1Scale }],
-                  opacity: waveAnim1.interpolate({
-                    inputRange: [0, 0.5, 1],
-                    outputRange: [0.15, 0.3, 0.15],
-                  }),
+                  opacity: wave1Opacity, // Assuming wave1Opacity is the intended value
                 },
               ]}
             />
@@ -445,14 +442,26 @@ const styles = StyleSheet.create({
     bottom: 100,
     left: -50,
   },
-  logoContainer: {
+  logoSection: {
+    flex: 1,
+    justifyContent: 'center',
     alignItems: 'center',
     zIndex: 10,
-    marginTop: -50, // Adjust for better positioning
+    paddingTop: 60, // Account for status bar and safe area
+    paddingBottom: 40,
+  },
+  logoContainer: {
+    alignItems: 'center',
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.1,
+    shadowRadius: 8,
+    elevation: 4,
   },
   logo: {
-    width: 200,
-    height: 80,
+    width: 240,
+    height: 90,
+    tintColor: undefined, // Ensure no tinting is applied
   },
   whiteSection: {
     position: 'absolute',
