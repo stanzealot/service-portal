@@ -1,13 +1,11 @@
-// app/auth/login.tsx - Exact Design Match with Custom Border Radius
+// app/auth/login.tsx - Simple Layout First
 import { Ionicons } from '@expo/vector-icons';
+import { Image } from 'expo-image';
 import { router } from 'expo-router';
-import React, { useEffect, useRef, useState } from 'react';
+import React, { useState } from 'react';
 import {
-  Animated,
   Dimensions,
-  Image,
   KeyboardAvoidingView,
-  Modal,
   Platform,
   Pressable,
   SafeAreaView,
@@ -22,10 +20,6 @@ import { useAuthStore } from '../../store/authStore';
 
 const { width: SCREEN_WIDTH, height: SCREEN_HEIGHT } = Dimensions.get('window');
 
-// Calculate responsive dimensions
-const TOP_SECTION_HEIGHT = SCREEN_HEIGHT - 576; // Dynamic top section
-const WHITE_SECTION_HEIGHT = 576; // Fixed white section height
-
 export default function LoginScreen() {
   const [formData, setFormData] = useState({
     email: '',
@@ -33,69 +27,8 @@ export default function LoginScreen() {
   });
   const [showPassword, setShowPassword] = useState(false);
   const [loading, setLoading] = useState(false);
-  const [showBiometricModal, setShowBiometricModal] = useState(false);
 
   const { login } = useAuthStore();
-
-  // Animations
-  const fadeAnim = useRef(new Animated.Value(0)).current;
-  const slideAnim = useRef(new Animated.Value(30)).current;
-  const rippleAnim = useRef(new Animated.Value(0)).current;
-  const biometricPulse = useRef(new Animated.Value(1)).current;
-
-  // Wave animations for background ellipses
-  const waveAnim1 = useRef(new Animated.Value(0)).current;
-  const waveAnim2 = useRef(new Animated.Value(0)).current;
-
-  useEffect(() => {
-    // Entry animation
-    Animated.parallel([
-      Animated.timing(fadeAnim, {
-        toValue: 1,
-        duration: 800,
-        useNativeDriver: true,
-      }),
-      Animated.spring(slideAnim, {
-        toValue: 0,
-        tension: 100,
-        friction: 8,
-        useNativeDriver: true,
-      }),
-    ]).start();
-
-    // Biometric pulse animation
-    Animated.loop(
-      Animated.sequence([
-        Animated.timing(biometricPulse, {
-          toValue: 1.1,
-          duration: 1500,
-          useNativeDriver: true,
-        }),
-        Animated.timing(biometricPulse, {
-          toValue: 1,
-          duration: 1500,
-          useNativeDriver: true,
-        }),
-      ])
-    ).start();
-
-    // Wave ripple animations
-    Animated.loop(
-      Animated.timing(waveAnim1, {
-        toValue: 1,
-        duration: 4000,
-        useNativeDriver: true,
-      })
-    ).start();
-
-    Animated.loop(
-      Animated.timing(waveAnim2, {
-        toValue: 1,
-        duration: 6000,
-        useNativeDriver: true,
-      })
-    ).start();
-  }, []);
 
   const handleLogin = async () => {
     if (!formData.email.trim() || !formData.password.trim()) {
@@ -104,13 +37,6 @@ export default function LoginScreen() {
     }
 
     setLoading(true);
-
-    rippleAnim.setValue(0);
-    Animated.timing(rippleAnim, {
-      toValue: 1,
-      duration: 600,
-      useNativeDriver: true,
-    }).start();
 
     setTimeout(() => {
       const mockUser = {
@@ -126,53 +52,6 @@ export default function LoginScreen() {
     }, 2000);
   };
 
-  const handleBiometric = () => {
-    setShowBiometricModal(true);
-
-    setTimeout(() => {
-      setShowBiometricModal(false);
-      const mockUser = {
-        id: '1',
-        name: 'Biometric User',
-        email: 'biometric@lfz.com',
-        role: 'user',
-      };
-      login(mockUser, 'biometric_token');
-      router.push('/(authenticated)/dashboard' as any);
-    }, 2500);
-  };
-
-  const rippleScale = rippleAnim.interpolate({
-    inputRange: [0, 1],
-    outputRange: [0, 1],
-  });
-
-  const rippleOpacity = rippleAnim.interpolate({
-    inputRange: [0, 1],
-    outputRange: [0.3, 0],
-  });
-
-  // Wave animations
-  const wave1Scale = waveAnim1.interpolate({
-    inputRange: [0, 0.5, 1],
-    outputRange: [1, 1.2, 1],
-  });
-
-  const wave1Opacity = waveAnim1.interpolate({
-    inputRange: [0, 0.5, 1],
-    outputRange: [0.3, 0.6, 0.3],
-  });
-
-  const wave2Scale = waveAnim2.interpolate({
-    inputRange: [0, 0.5, 1],
-    outputRange: [1, 1.15, 1],
-  });
-
-  const wave2Opacity = waveAnim2.interpolate({
-    inputRange: [0, 0.5, 1],
-    outputRange: [0.4, 0.7, 0.4],
-  });
-
   return (
     <SafeAreaView style={styles.container}>
       <StatusBar barStyle="light-content" backgroundColor="#000F29" />
@@ -181,74 +60,17 @@ export default function LoginScreen() {
         behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
         style={styles.keyboardAvoid}
       >
-        {/* Blue Background Section - Full screen */}
+        {/* Blue Background Section */}
         <View style={styles.blueBackground}>
-          {/* Background Ellipses with Wave Animation */}
-          <View style={styles.backgroundEllipses}>
-            {/* Top-left ellipse */}
-            <Animated.View
-              style={[
-                styles.ellipse,
-                styles.ellipse1,
-                {
-                  transform: [{ scale: wave1Scale }],
-                  opacity: wave1Opacity,
-                },
-              ]}
-            />
-
-            {/* Right-center ellipse */}
-            <Animated.View
-              style={[
-                styles.ellipse,
-                styles.ellipse2,
-                {
-                  transform: [{ scale: wave2Scale }],
-                  opacity: wave2Opacity,
-                },
-              ]}
-            />
-
-            {/* Additional subtle ellipses */}
-            <Animated.View
-              style={[
-                styles.ellipse,
-                styles.ellipse3,
-                {
-                  transform: [{ scale: wave1Scale }],
-                  opacity: wave1Opacity, // Assuming wave1Opacity is the intended value
-                },
-              ]}
-            />
-          </View>
-
-          {/* Logo */}
-          <Animated.View
-            style={[
-              styles.logoContainer,
-              {
-                opacity: fadeAnim,
-                transform: [{ translateY: slideAnim }],
-              },
-            ]}
-          >
-            <Image
-              source={require('../../assets/logo-large.png')}
-              style={styles.logo}
-              resizeMode="contain"
-            />
-          </Animated.View>
+          <Image
+            source={require('../../assets/logo-blue.png')}
+            style={{ height: 87, width: 199 }}
+          />
+          {/* <Text style={styles.logoText}>LOGO PLACEHOLDER</Text> */}
         </View>
 
-        {/* White Section with Custom Border Radius */}
-        <Animated.View
-          style={[
-            styles.whiteSection,
-            {
-              opacity: fadeAnim,
-            },
-          ]}
-        >
+        {/* White Section with Form */}
+        <View style={styles.whiteSection}>
           <ScrollView
             contentContainerStyle={styles.scrollContent}
             showsVerticalScrollIndicator={false}
@@ -313,80 +135,27 @@ export default function LoginScreen() {
                 <Text style={styles.forgotPasswordText}>Forgot Password?</Text>
               </Pressable>
 
-              {/* Sign In Button with Ripple Effect */}
+              {/* Sign In Button */}
               <Pressable
                 style={styles.signInButton}
                 onPress={handleLogin}
                 disabled={loading}
               >
-                <Animated.View
-                  style={[
-                    styles.ripple,
-                    {
-                      transform: [{ scale: rippleScale }],
-                      opacity: rippleOpacity,
-                    },
-                  ]}
-                />
-
                 {loading ? (
-                  <View style={styles.loadingContainer}>
-                    <Animated.View style={styles.loadingDot} />
-                    <Animated.View
-                      style={[styles.loadingDot, { marginLeft: 8 }]}
-                    />
-                    <Animated.View
-                      style={[styles.loadingDot, { marginLeft: 8 }]}
-                    />
-                  </View>
+                  <Text style={styles.signInButtonText}>Loading...</Text>
                 ) : (
                   <Text style={styles.signInButtonText}>Sign In</Text>
                 )}
               </Pressable>
 
               {/* Biometric Button */}
-              <Pressable
-                style={styles.biometricButton}
-                onPress={handleBiometric}
-              >
-                <Animated.View
-                  style={[
-                    styles.biometricIcon,
-                    { transform: [{ scale: biometricPulse }] },
-                  ]}
-                >
-                  <Ionicons name="finger-print" size={32} color="#666" />
-                </Animated.View>
+              <Pressable style={styles.biometricButton}>
+                <Ionicons name="finger-print" size={66} color="#666" />
               </Pressable>
             </View>
           </ScrollView>
-        </Animated.View>
-      </KeyboardAvoidingView>
-
-      {/* Biometric Authentication Modal */}
-      <Modal
-        visible={showBiometricModal}
-        transparent
-        animationType="fade"
-        onRequestClose={() => setShowBiometricModal(false)}
-      >
-        <View style={styles.modalOverlay}>
-          <View style={styles.biometricModal}>
-            <View style={styles.modalContent}>
-              <View style={styles.loadingCircleContainer}>
-                <Animated.View style={styles.loadingCircle}>
-                  <View style={styles.loadingSpinner} />
-                </Animated.View>
-              </View>
-
-              <Text style={styles.modalTitle}>Touch ID</Text>
-              <Text style={styles.modalSubtitle}>
-                Use your fingerprint to authenticate
-              </Text>
-            </View>
-          </View>
         </View>
-      </Modal>
+      </KeyboardAvoidingView>
     </SafeAreaView>
   );
 }
@@ -400,87 +169,23 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   blueBackground: {
-    position: 'absolute',
-    top: 0,
-    left: 0,
-    right: 0,
-    bottom: 0,
+    height: SCREEN_HEIGHT * 0.28, // 40% of screen height
     backgroundColor: '#000F29',
     justifyContent: 'center',
     alignItems: 'center',
-    overflow: 'hidden',
   },
-  backgroundEllipses: {
-    position: 'absolute',
-    top: 0,
-    left: 0,
-    right: 0,
-    bottom: 0,
-  },
-  ellipse: {
-    position: 'absolute',
-    borderRadius: 999,
-    backgroundColor: 'rgba(255, 255, 255, 0.03)',
-    borderWidth: 1,
-    borderColor: 'rgba(255, 255, 255, 0.05)',
-  },
-  ellipse1: {
-    width: 400,
-    height: 400,
-    top: -200,
-    left: -150,
-  },
-  ellipse2: {
-    width: 300,
-    height: 300,
-    top: '30%',
-    right: -150,
-  },
-  ellipse3: {
-    width: 200,
-    height: 200,
-    bottom: 100,
-    left: -50,
-  },
-  logoSection: {
-    flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
-    zIndex: 10,
-    paddingTop: 60, // Account for status bar and safe area
-    paddingBottom: 40,
-  },
-  logoContainer: {
-    alignItems: 'center',
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 4 },
-    shadowOpacity: 0.1,
-    shadowRadius: 8,
-    elevation: 4,
-  },
-  logo: {
-    width: 240,
-    height: 90,
-    tintColor: undefined, // Ensure no tinting is applied
+  logoText: {
+    color: '#FFFFFF',
+    fontSize: 32,
+    fontWeight: '700',
+    letterSpacing: 2,
   },
   whiteSection: {
-    position: 'absolute',
-    bottom: 0,
-    left: 0,
-    right: 0,
-    height: WHITE_SECTION_HEIGHT,
+    flex: 1,
     backgroundColor: '#FFFFFF',
-    // Custom border radius - key change!
     borderTopLeftRadius: 0,
     borderTopRightRadius: 137,
-    borderBottomLeftRadius: 0,
-    borderBottomRightRadius: 2,
-    // Additional styling for iOS shadow
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: -5 },
-    shadowOpacity: 0.1,
-    shadowRadius: 10,
-    elevation: 10,
+    marginTop: -20, // Slight overlap
   },
   scrollContent: {
     flexGrow: 1,
@@ -558,96 +263,13 @@ const styles = StyleSheet.create({
     paddingVertical: 20,
     alignItems: 'center',
     marginBottom: 40,
-    position: 'relative',
-    overflow: 'hidden',
-    shadowColor: '#000F29',
-    shadowOffset: { width: 0, height: 6 },
-    shadowOpacity: 0.2,
-    shadowRadius: 10,
-    elevation: 8,
-  },
-  ripple: {
-    position: 'absolute',
-    width: '200%',
-    height: '200%',
-    borderRadius: 999,
-    backgroundColor: 'rgba(255, 255, 255, 0.2)',
   },
   signInButtonText: {
     color: '#FFFFFF',
     fontSize: 18,
     fontWeight: '600',
-    zIndex: 1,
-  },
-  loadingContainer: {
-    flexDirection: 'row',
-    alignItems: 'center',
-  },
-  loadingDot: {
-    width: 8,
-    height: 8,
-    borderRadius: 4,
-    backgroundColor: '#FFFFFF',
   },
   biometricButton: {
     alignItems: 'center',
-    paddingVertical: 20,
-  },
-  biometricIcon: {
-    padding: 12,
-  },
-  modalOverlay: {
-    flex: 1,
-    backgroundColor: 'rgba(0, 0, 0, 0.7)',
-    justifyContent: 'center',
-    alignItems: 'center',
-  },
-  biometricModal: {
-    backgroundColor: '#FFFFFF',
-    borderRadius: 24,
-    minWidth: 300,
-    maxWidth: 320,
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 20 },
-    shadowOpacity: 0.25,
-    shadowRadius: 25,
-    elevation: 20,
-  },
-  modalContent: {
-    padding: 32,
-    alignItems: 'center',
-  },
-  loadingCircleContainer: {
-    marginBottom: 24,
-  },
-  loadingCircle: {
-    width: 80,
-    height: 80,
-    borderRadius: 40,
-    borderWidth: 3,
-    borderColor: '#E8E8E8',
-    borderTopColor: '#007AFF',
-    justifyContent: 'center',
-    alignItems: 'center',
-  },
-  loadingSpinner: {
-    width: 60,
-    height: 60,
-    borderRadius: 30,
-    borderWidth: 2,
-    borderColor: 'transparent',
-    borderTopColor: '#007AFF',
-  },
-  modalTitle: {
-    fontSize: 20,
-    fontWeight: '700',
-    color: '#333',
-    marginBottom: 8,
-  },
-  modalSubtitle: {
-    fontSize: 14,
-    color: '#666',
-    textAlign: 'center',
-    lineHeight: 20,
   },
 });
