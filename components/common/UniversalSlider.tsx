@@ -1,4 +1,4 @@
-// components/UniversalSlider.tsx
+// components/common/UniversalSlider.tsx
 import { LinearGradient } from 'expo-linear-gradient';
 import React, { useCallback, useEffect, useRef, useState } from 'react';
 import {
@@ -45,7 +45,7 @@ const SliderPagination: React.FC<{
   currentIndex: number;
   variant: 'news' | 'gallery';
 }> = ({ items, currentIndex, variant }) => {
-  if (variant === 'gallery') return null; // Gallery doesn't show pagination
+  if (variant === 'gallery') return null;
 
   return (
     <View style={styles.paginationContainer}>
@@ -65,7 +65,7 @@ const SliderPagination: React.FC<{
   );
 };
 
-// News Item Component
+// News Item Component (Full Width)
 const NewsSliderItem: React.FC<{
   item: SliderItem;
   index: number;
@@ -123,28 +123,26 @@ const NewsSliderItem: React.FC<{
   );
 };
 
-// Gallery Item Component
+// Gallery Item Component (Center Focus Style)
 const GallerySliderItem: React.FC<{
   item: SliderItem;
   index: number;
   scrollX: Animated.SharedValue<number>;
-  width: number;
+  itemWidth: number;
+  spacing: number;
   onPress?: () => void;
-}> = ({ item, index, scrollX, width, onPress }) => {
-  const ITEM_WIDTH = width * 0.7;
-  const SPACING = 16;
-
+}> = ({ item, index, scrollX, itemWidth, spacing, onPress }) => {
   const animatedStyle = useAnimatedStyle(() => {
     const inputRange = [
-      (index - 1) * (ITEM_WIDTH + SPACING),
-      index * (ITEM_WIDTH + SPACING),
-      (index + 1) * (ITEM_WIDTH + SPACING),
+      (index - 1) * (itemWidth + spacing),
+      index * (itemWidth + spacing),
+      (index + 1) * (itemWidth + spacing),
     ];
 
     const scale = interpolate(
       scrollX.value,
       inputRange,
-      [0.8, 1, 0.8],
+      [0.85, 1, 0.85],
       Extrapolate.CLAMP
     );
 
@@ -162,7 +160,10 @@ const GallerySliderItem: React.FC<{
   });
 
   return (
-    <Pressable onPress={onPress}>
+    <Pressable
+      onPress={onPress}
+      style={{ width: itemWidth, marginHorizontal: spacing / 2 }}
+    >
       <Animated.View style={[styles.galleryItemContainer, animatedStyle]}>
         <Image source={{ uri: item.image }} style={styles.galleryImage} />
         <View style={styles.galleryOverlay}>
@@ -195,19 +196,19 @@ export const UniversalSlider: React.FC<UniversalSliderProps> = ({
   // Calculate dimensions based on variant
   const getItemWidth = () => {
     if (variant === 'news') return screenWidth;
-    if (variant === 'gallery') return screenWidth * 0.7;
+    if (variant === 'gallery') return screenWidth * 0.75; // Adjusted for better center focus
     return screenWidth;
   };
 
   const getItemSpacing = () => {
-    if (variant === 'gallery') return 16;
+    if (variant === 'gallery') return 20;
     return 0;
   };
 
   const itemWidth = getItemWidth();
   const spacing = getItemSpacing();
 
-  // Auto-play functionality - simpler approach for SDK 53
+  // Auto-play functionality
   useEffect(() => {
     if (isAutoPlay && variant === 'news' && data.length > 1) {
       autoPlayRef.current = setInterval(() => {
@@ -242,6 +243,7 @@ export const UniversalSlider: React.FC<UniversalSliderProps> = ({
     },
   });
 
+  // Viewable items changed handler
   const onViewableItemsChanged = useCallback(
     ({ viewableItems }: { viewableItems: ViewToken[] }) => {
       if (
@@ -262,6 +264,7 @@ export const UniversalSlider: React.FC<UniversalSliderProps> = ({
     { viewabilityConfig, onViewableItemsChanged },
   ]);
 
+  // Render item based on variant
   const renderItem = ({ item, index }: { item: SliderItem; index: number }) => {
     const handlePress = () => onItemPress?.(item, index);
 
@@ -282,21 +285,14 @@ export const UniversalSlider: React.FC<UniversalSliderProps> = ({
         item={item}
         index={index}
         scrollX={scrollX}
-        width={screenWidth}
+        itemWidth={itemWidth}
+        spacing={spacing}
         onPress={handlePress}
       />
     );
   };
 
-  const getContentContainerStyle = () => {
-    if (variant === 'gallery') {
-      return {
-        paddingHorizontal: (screenWidth - itemWidth) / 2,
-      };
-    }
-    return {};
-  };
-
+  // Handle scroll begin/end for auto-play
   const handleScrollBeginDrag = () => {
     setIsAutoPlay(false);
   };
@@ -323,7 +319,11 @@ export const UniversalSlider: React.FC<UniversalSliderProps> = ({
           }
           snapToAlignment={variant === 'gallery' ? 'center' : 'start'}
           decelerationRate={variant === 'gallery' ? 'fast' : 'normal'}
-          contentContainerStyle={getContentContainerStyle()}
+          contentContainerStyle={
+            variant === 'gallery'
+              ? { paddingHorizontal: (screenWidth - itemWidth) / 2 }
+              : {}
+          }
           onScroll={onScrollHandler}
           scrollEventThrottle={16}
           viewabilityConfigCallbackPairs={
@@ -415,13 +415,21 @@ const styles = StyleSheet.create({
 
   // Gallery Slider Styles
   galleryItemContainer: {
-    width: '100%',
-    marginHorizontal: 8,
+    borderRadius: 12,
+    overflow: 'hidden',
+    shadowColor: '#000',
+    shadowOffset: {
+      width: 0,
+      height: 2,
+    },
+    shadowOpacity: 0.1,
+    shadowRadius: 3.84,
+    elevation: 5,
   },
   galleryImage: {
     width: '100%',
-    height: 140,
-    borderRadius: 8,
+    height: 160,
+    borderRadius: 12,
   },
   galleryOverlay: {
     position: 'absolute',
@@ -430,13 +438,14 @@ const styles = StyleSheet.create({
     right: 0,
     backgroundColor: 'rgba(0, 0, 0, 0.6)',
     padding: 12,
-    borderBottomLeftRadius: 8,
-    borderBottomRightRadius: 8,
+    borderBottomLeftRadius: 12,
+    borderBottomRightRadius: 12,
   },
   galleryTitle: {
     color: '#FFFFFF',
-    fontSize: 12,
-    fontWeight: '500',
+    fontSize: 13,
+    fontWeight: '600',
+    textAlign: 'center',
   },
 
   // Pagination Styles

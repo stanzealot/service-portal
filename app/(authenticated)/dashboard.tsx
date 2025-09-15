@@ -1,27 +1,25 @@
 // app/(authenticated)/dashboard.tsx
-import { Ionicons } from '@expo/vector-icons';
 import { StatusBar } from 'expo-status-bar';
 import React, { useState } from 'react';
-import {
-  Dimensions,
-  FlatList,
-  Pressable,
-  SafeAreaView,
-  ScrollView,
-  StyleSheet,
-  Text,
-  View,
-} from 'react-native';
+import { ScrollView, StyleSheet, View } from 'react-native';
+import { Header } from '../../components/common/Header';
 import {
   mockGalleryData,
   mockNewsData,
   SliderItem,
   UniversalSlider,
 } from '../../components/common/UniversalSlider';
+import {
+  EventsTabContent,
+  LinksTabContent,
+  UpdatesTabContent,
+} from '../../components/dashboard/TabContent';
+import {
+  TabNavigation,
+  TabType,
+} from '../../components/dashboard/TabNavigation';
 
-const { width: SCREEN_WIDTH } = Dimensions.get('window');
-
-// Mock data for events (keeping your existing structure)
+// Mock data
 const mockEvents = [
   {
     id: '1',
@@ -40,7 +38,6 @@ const mockEvents = [
   },
 ];
 
-// Mock data for birthdays and new staff (from your figma design)
 const mockBirthdays = [
   {
     id: '1',
@@ -89,11 +86,19 @@ const mockHelpfulLinks = [
 ];
 
 export default function DashboardScreen() {
-  const [activeTab, setActiveTab] = useState<'events' | 'updates' | 'links'>(
-    'events'
-  );
+  const [activeTab, setActiveTab] = useState<TabType>('events');
 
-  // Handle slider item press
+  // Event handlers
+  const handleMenuPress = () => {
+    console.log('Menu pressed');
+    // Add your menu logic here
+  };
+
+  const handleNotificationPress = () => {
+    console.log('Notification pressed');
+    // Add your notification logic here
+  };
+
   const handleNewsPress = (item: SliderItem, index: number) => {
     console.log('News item pressed:', item.title);
     // Add your navigation logic here
@@ -104,156 +109,52 @@ export default function DashboardScreen() {
     // Add your navigation logic here
   };
 
-  const renderEventItem = ({ item }: { item: any }) => (
-    <View style={styles.eventItem}>
-      <View style={styles.eventIndicator} />
-      <View style={styles.eventContent}>
-        <Text style={styles.eventDate}>{item.date}</Text>
-        <Text style={styles.eventTitle}>{item.title}</Text>
-      </View>
-    </View>
-  );
-
-  const renderBirthdayItem = ({ item }: { item: any }) => (
-    <View style={styles.birthdayItem}>
-      <View style={[styles.avatarCircle, { backgroundColor: '#E3F2FD' }]}>
-        <Text style={styles.avatarText}>{item.initial}</Text>
-      </View>
-      <View style={styles.birthdayContent}>
-        <Text style={styles.birthdayName}>{item.name}</Text>
-        <Text style={styles.birthdayDepartment}>{item.department}</Text>
-        <Text style={styles.birthdayDate}>{item.date}</Text>
-      </View>
-    </View>
-  );
-
-  const renderNewStaffItem = ({ item }: { item: any }) => (
-    <View style={styles.newStaffItem}>
-      <View style={[styles.avatarCircle, { backgroundColor: '#FFF3E0' }]}>
-        <Text style={styles.avatarText}>{item.initial}</Text>
-      </View>
-      <View style={styles.newStaffContent}>
-        <Text style={styles.newStaffName}>{item.name}</Text>
-        <Text style={styles.newStaffDepartment}>{item.department}</Text>
-      </View>
-    </View>
-  );
-
-  const renderHelpfulLinkItem = ({ item }: { item: any }) => (
-    <Pressable style={styles.linkItem}>
-      <View style={styles.linkIconContainer}>
-        <Ionicons name={item.icon as any} size={24} color="#002B82" />
-      </View>
-      <Text style={styles.linkTitle}>{item.title}</Text>
-    </Pressable>
-  );
-
-  const renderQuickActionButton = (
-    title: string,
-    tabKey: 'events' | 'updates' | 'links',
-    isActive = false
-  ) => (
-    <Pressable
-      style={[styles.actionButton, isActive && styles.actionButtonActive]}
-      onPress={() => setActiveTab(tabKey)}
-    >
-      <Text
-        style={[
-          styles.actionButtonText,
-          isActive && styles.actionButtonTextActive,
-        ]}
-      >
-        {title}
-      </Text>
-    </Pressable>
-  );
+  const handleLinkPress = (link: any) => {
+    console.log('Link pressed:', link.title);
+    // Add your link navigation logic here
+  };
 
   const renderTabContent = () => {
     switch (activeTab) {
       case 'events':
-        return (
-          <View style={styles.section}>
-            <FlatList
-              data={mockEvents}
-              renderItem={renderEventItem}
-              keyExtractor={(item) => item.id}
-              scrollEnabled={false}
-            />
-          </View>
-        );
-
+        return <EventsTabContent events={mockEvents} />;
       case 'updates':
         return (
-          <View style={styles.section}>
-            <View style={styles.updatesContainer}>
-              <View style={styles.updateColumn}>
-                <Text style={styles.updateColumnTitle}>Birthdays</Text>
-                <FlatList
-                  data={mockBirthdays}
-                  renderItem={renderBirthdayItem}
-                  keyExtractor={(item) => item.id}
-                  scrollEnabled={false}
-                />
-              </View>
-
-              <View style={styles.updateColumn}>
-                <Text style={styles.updateColumnTitle}>New Staff</Text>
-                <FlatList
-                  data={mockNewStaff}
-                  renderItem={renderNewStaffItem}
-                  keyExtractor={(item) => item.id}
-                  scrollEnabled={false}
-                />
-              </View>
-            </View>
-          </View>
+          <UpdatesTabContent
+            birthdays={mockBirthdays}
+            newStaff={mockNewStaff}
+          />
         );
-
       case 'links':
         return (
-          <View style={styles.section}>
-            <View style={styles.linksGrid}>
-              {mockHelpfulLinks.map((item) => (
-                <View key={item.id} style={styles.linkItemWrapper}>
-                  {renderHelpfulLinkItem({ item })}
-                </View>
-              ))}
-            </View>
-          </View>
+          <LinksTabContent
+            links={mockHelpfulLinks}
+            onLinkPress={handleLinkPress}
+          />
         );
-
       default:
         return null;
     }
   };
 
   return (
-    <SafeAreaView style={styles.container}>
+    <View style={styles.container}>
       <StatusBar style="light" backgroundColor="#002B82" />
 
-      <View style={styles.headerContainer}>
-        {/* Header */}
-        <View style={styles.header}>
-          <View style={styles.headerLeft}>
-            <Pressable style={styles.menuButton}>
-              <Ionicons name="menu" size={24} color="#FFFFFF" />
-            </Pressable>
-            <View style={styles.headerTitle}>
-              <Text style={styles.headerTitleText}>Welcome to One Portal</Text>
-            </View>
-          </View>
-          <View style={styles.headerRight}>
-            <Pressable style={styles.notificationButton}>
-              <Ionicons name="notifications" size={20} color="#FFFFFF" />
-              <View style={styles.notificationBadge}>
-                <Text style={styles.notificationBadgeText}>!</Text>
-              </View>
-            </Pressable>
-          </View>
-        </View>
-      </View>
+      {/* Header */}
+      <Header
+        title="Welcome to One Portal"
+        onMenuPress={handleMenuPress}
+        onNotificationPress={handleNotificationPress}
+        showNotificationBadge={true}
+      />
 
-      <ScrollView style={styles.content} showsVerticalScrollIndicator={false}>
+      {/* Main Content */}
+      <ScrollView
+        style={styles.content}
+        showsVerticalScrollIndicator={false}
+        bounces={true}
+      >
         {/* News Slider */}
         <View style={styles.newsSection}>
           <UniversalSlider
@@ -266,30 +167,8 @@ export default function DashboardScreen() {
           />
         </View>
 
-        {/* Quick Actions */}
-        <View style={styles.quickActionsContainer}>
-          <ScrollView
-            horizontal
-            showsHorizontalScrollIndicator={false}
-            contentContainerStyle={styles.quickActionsContent}
-          >
-            {renderQuickActionButton(
-              'Upcoming Events',
-              'events',
-              activeTab === 'events'
-            )}
-            {renderQuickActionButton(
-              'Employee Updates',
-              'updates',
-              activeTab === 'updates'
-            )}
-            {renderQuickActionButton(
-              'Helpful Links',
-              'links',
-              activeTab === 'links'
-            )}
-          </ScrollView>
-        </View>
+        {/* Tab Navigation */}
+        <TabNavigation activeTab={activeTab} onTabChange={setActiveTab} />
 
         {/* Dynamic Tab Content */}
         {renderTabContent()}
@@ -306,266 +185,35 @@ export default function DashboardScreen() {
           />
         </View>
       </ScrollView>
-    </SafeAreaView>
+    </View>
   );
 }
 
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#002B82',
+    backgroundColor: '#F2F5FD', // Updated background color as requested
   },
   content: {
     flex: 1,
-    backgroundColor: '#F5F5F5',
+    backgroundColor: '#F2F5FD',
   },
-  headerContainer: {
-    backgroundColor: '#F5F5F5',
-  },
-  header: {
-    backgroundColor: '#002B82',
-    borderBottomLeftRadius: 20,
-    borderBottomRightRadius: 20,
-    paddingHorizontal: 16,
-    paddingVertical: 16,
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'space-between',
-    height: 123,
-  },
-  headerLeft: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    flex: 1,
-  },
-  menuButton: {
-    padding: 4,
-    marginRight: 12,
-  },
-  headerTitle: {
-    flex: 1,
-  },
-  headerTitleText: {
-    color: '#FFFFFF',
-    fontSize: 18,
-    fontWeight: '600',
-  },
-  headerRight: {
-    flexDirection: 'row',
-    alignItems: 'center',
-  },
-  notificationButton: {
-    position: 'relative',
-  },
-  notificationBadge: {
-    position: 'absolute',
-    top: -2,
-    right: -2,
-    backgroundColor: '#FFFFFF',
-    borderRadius: 10,
-    width: 20,
-    height: 20,
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  notificationBadgeText: {
-    color: '#002B82',
-    fontSize: 12,
-    fontWeight: 'bold',
-  },
-
-  // News Section
   newsSection: {
     paddingTop: 20,
   },
-
-  // Quick Actions
-  quickActionsContainer: {
-    marginBottom: 20,
-    paddingHorizontal: 16,
-  },
-  quickActionsContent: {
-    gap: 12,
-    paddingRight: 16,
-  },
-  actionButton: {
-    paddingHorizontal: 20,
-    paddingVertical: 10,
-    borderRadius: 20,
-    backgroundColor: '#FFFFFF',
-    borderWidth: 1,
-    borderColor: '#E5E7EB',
-    minWidth: 120,
-    alignItems: 'center',
-  },
-  actionButtonActive: {
-    backgroundColor: '#002B82',
-    borderColor: '#002B82',
-  },
-  actionButtonText: {
-    fontSize: 14,
-    fontWeight: '500',
-    color: '#6B7280',
-  },
-  actionButtonTextActive: {
-    color: '#FFFFFF',
-  },
-
-  // Sections
-  section: {
-    backgroundColor: '#FFFFFF',
-    marginHorizontal: 16,
-    marginBottom: 20,
-    borderRadius: 12,
-    padding: 16,
-  },
-
-  // Events
-  eventItem: {
-    flexDirection: 'row',
-    alignItems: 'flex-start',
-    marginBottom: 16,
-  },
-  eventIndicator: {
-    width: 4,
-    height: 40,
-    backgroundColor: '#002B82',
-    borderRadius: 2,
-    marginRight: 12,
-    marginTop: 2,
-  },
-  eventContent: {
-    flex: 1,
-  },
-  eventDate: {
-    fontSize: 12,
-    color: '#595959',
-    marginBottom: 4,
-  },
-  eventTitle: {
-    fontSize: 16,
-    fontWeight: '600',
-    color: '#292929',
-    lineHeight: 20,
-  },
-
-  // Updates Section
-  updatesContainer: {
-    flexDirection: 'row',
-    gap: 20,
-  },
-  updateColumn: {
-    flex: 1,
-  },
-  updateColumnTitle: {
-    fontSize: 16,
-    fontWeight: '700',
-    color: '#1F2937',
-    marginBottom: 12,
-  },
-
-  // Birthdays
-  birthdayItem: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    marginBottom: 12,
-  },
-  birthdayContent: {
-    marginLeft: 12,
-    flex: 1,
-  },
-  birthdayName: {
-    fontSize: 14,
-    fontWeight: '600',
-    color: '#1F2937',
-  },
-  birthdayDepartment: {
-    fontSize: 12,
-    color: '#6B7280',
-    marginTop: 2,
-  },
-  birthdayDate: {
-    fontSize: 12,
-    color: '#6B7280',
-    marginTop: 2,
-  },
-
-  // New Staff
-  newStaffItem: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    marginBottom: 12,
-  },
-  newStaffContent: {
-    marginLeft: 12,
-    flex: 1,
-  },
-  newStaffName: {
-    fontSize: 14,
-    fontWeight: '600',
-    color: '#1F2937',
-  },
-  newStaffDepartment: {
-    fontSize: 12,
-    color: '#6B7280',
-    marginTop: 2,
-  },
-
-  // Avatar Circle (shared for birthdays and new staff)
-  avatarCircle: {
-    width: 36,
-    height: 36,
-    borderRadius: 18,
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  avatarText: {
-    fontSize: 16,
-    fontWeight: '600',
-    color: '#002B82',
-  },
-
-  // Helpful Links
-  linksGrid: {
-    flexDirection: 'row',
-    flexWrap: 'wrap',
-    gap: 16,
-  },
-  linkItemWrapper: {
-    width: '30%',
-    minWidth: 90,
-  },
-  linkItem: {
-    alignItems: 'center',
-    padding: 12,
-    backgroundColor: '#F8F9FA',
-    borderRadius: 8,
-    minHeight: 80,
-    justifyContent: 'center',
-  },
-  linkIconContainer: {
-    width: 36,
-    height: 36,
-    borderRadius: 18,
-    backgroundColor: '#E3F2FD',
-    alignItems: 'center',
-    justifyContent: 'center',
-    marginBottom: 8,
-  },
-  linkTitle: {
-    fontSize: 10,
-    fontWeight: '500',
-    color: '#1F2937',
-    textAlign: 'center',
-    lineHeight: 12,
-  },
-
-  // Gallery Section
   gallerySection: {
     backgroundColor: '#FFFFFF',
     marginHorizontal: 16,
     marginBottom: 20,
     borderRadius: 12,
     paddingVertical: 16,
+    shadowColor: '#000',
+    shadowOffset: {
+      width: 0,
+      height: 2,
+    },
+    shadowOpacity: 0.1,
+    shadowRadius: 3.84,
+    elevation: 5,
   },
 });
