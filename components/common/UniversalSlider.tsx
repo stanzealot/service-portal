@@ -413,39 +413,30 @@ const styles = StyleSheet.create({
     lineHeight: 18,
   },
 
-  // Gallery Slider Styles
+  // Gallery Slider Styles (Now identical to news)
   galleryItemContainer: {
-    borderRadius: 12,
-    overflow: 'hidden',
-    shadowColor: '#000',
-    shadowOffset: {
-      width: 0,
-      height: 2,
-    },
-    shadowOpacity: 0.1,
-    shadowRadius: 3.84,
-    elevation: 5,
+    paddingHorizontal: 16,
   },
   galleryImage: {
     width: '100%',
-    height: 160,
+    height: 180,
     borderRadius: 12,
   },
   galleryOverlay: {
     position: 'absolute',
     bottom: 0,
-    left: 0,
-    right: 0,
-    backgroundColor: 'rgba(0, 0, 0, 0.6)',
-    padding: 12,
-    borderBottomLeftRadius: 12,
-    borderBottomRightRadius: 12,
+    left: 16,
+    right: 16,
+    height: 180,
+    borderRadius: 12,
+    padding: 16,
+    justifyContent: 'flex-end',
   },
   galleryTitle: {
     color: '#FFFFFF',
-    fontSize: 13,
+    fontSize: 14,
     fontWeight: '600',
-    textAlign: 'center',
+    lineHeight: 18,
   },
 
   // Pagination Styles

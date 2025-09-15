@@ -202,18 +202,6 @@ const styles = StyleSheet.create({
     paddingTop: 20,
   },
   gallerySection: {
-    backgroundColor: '#FFFFFF',
-    marginHorizontal: 16,
     marginBottom: 20,
-    borderRadius: 12,
-    paddingVertical: 16,
-    shadowColor: '#000',
-    shadowOffset: {
-      width: 0,
-      height: 2,
-    },
-    shadowOpacity: 0.1,
-    shadowRadius: 3.84,
-    elevation: 5,
   },
 });
