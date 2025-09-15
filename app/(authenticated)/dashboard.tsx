@@ -4,12 +4,6 @@ import React, { useState } from 'react';
 import { ScrollView, StyleSheet, View } from 'react-native';
 import { Header } from '../../components/common/Header';
 import {
-  mockGalleryData,
-  mockNewsData,
-  SliderItem,
-  UniversalSlider,
-} from '../../components/common/UniversalSlider';
-import {
   EventsTabContent,
   LinksTabContent,
   UpdatesTabContent,
@@ -18,6 +12,12 @@ import {
   TabNavigation,
   TabType,
 } from '../../components/dashboard/TabNavigation';
+import {
+  mockGalleryData,
+  mockNewsData,
+  SliderItem,
+  UniversalSlider,
+} from '../../components/slider';
 
 // Mock data
 const mockEvents = [
@@ -91,27 +91,22 @@ export default function DashboardScreen() {
   // Event handlers
   const handleMenuPress = () => {
     console.log('Menu pressed');
-    // Add your menu logic here
   };
 
   const handleNotificationPress = () => {
     console.log('Notification pressed');
-    // Add your notification logic here
   };
 
   const handleNewsPress = (item: SliderItem, index: number) => {
     console.log('News item pressed:', item.title);
-    // Add your navigation logic here
   };
 
   const handleGalleryPress = (item: SliderItem, index: number) => {
     console.log('Gallery item pressed:', item.title);
-    // Add your navigation logic here
   };
 
   const handleLinkPress = (link: any) => {
     console.log('Link pressed:', link.title);
-    // Add your link navigation logic here
   };
 
   const renderTabContent = () => {
@@ -192,7 +187,7 @@ export default function DashboardScreen() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#F2F5FD', // Updated background color as requested
+    backgroundColor: '#F2F5FD',
   },
   content: {
     flex: 1,
