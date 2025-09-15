@@ -19,7 +19,7 @@ const { width: SCREEN_WIDTH, height: SCREEN_HEIGHT } = Dimensions.get('window');
 const onboardingData = [
   {
     id: 1,
-    title: 'Welcome to\nLagos Free Zone',
+    title: 'Welcome to\nLagos Free \nZone',
     subtitle:
       "Your gateway to seamless business operations in Nigeria's premier free trade zone",
     image: require('../../assets/images/onboarding/gateway-circle.png'),
@@ -40,7 +40,7 @@ const onboardingData = [
   },
   {
     id: 4,
-    title: 'Sustainable Growth,\nEquals Real Impact',
+    title: 'Sustainable \nGrowth,Equals \nReal Impact',
     subtitle:
       'Building tomorrow with sustainable practices and environmental responsibility at our core',
     image: require('../../assets/images/onboarding/gateway-circle.png'),
@@ -128,7 +128,8 @@ export default function OnboardingScreen() {
             ]}
           >
             <Text style={styles.title}>{currentSlide.title}</Text>
-            <Text style={styles.subtitle}>{currentSlide.subtitle}</Text>
+
+            {/* <Text style={styles.subtitle}>{currentSlide.subtitle}</Text> */}
           </Animated.View>
         </View>
 
@@ -152,6 +153,7 @@ export default function OnboardingScreen() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
+    backgroundColor: '#000F29',
   },
   gradient: {
     flex: 1,
@@ -166,22 +168,22 @@ const styles = StyleSheet.create({
     marginBottom: 60,
   },
   textContainer: {
-    alignItems: 'center',
-    paddingHorizontal: 20,
+    alignItems: 'flex-start',
+    alignSelf: 'stretch',
     maxWidth: SCREEN_WIDTH - 40,
   },
   title: {
-    fontSize: 32,
+    fontSize: 40,
     fontWeight: '700',
-    color: '#FFFFFF',
-    textAlign: 'center',
+    color: '#F2F2F2',
+    textAlign: 'left',
     marginBottom: 16,
-    lineHeight: 40,
+    lineHeight: 50,
   },
   subtitle: {
     fontSize: 16,
     color: 'rgba(255, 255, 255, 0.8)',
-    textAlign: 'center',
+    textAlign: 'left',
     lineHeight: 24,
     paddingHorizontal: 10,
     fontWeight: '400',

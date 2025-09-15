@@ -169,7 +169,7 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   blueBackground: {
-    height: SCREEN_HEIGHT * 0.28, // 40% of screen height
+    height: SCREEN_HEIGHT * 0.25, // 40% of screen height
     backgroundColor: '#000F29',
     justifyContent: 'center',
     alignItems: 'center',
@@ -185,7 +185,7 @@ const styles = StyleSheet.create({
     backgroundColor: '#FFFFFF',
     borderTopLeftRadius: 0,
     borderTopRightRadius: 137,
-    marginTop: -20, // Slight overlap
+    marginTop: -20,
   },
   scrollContent: {
     flexGrow: 1,
@@ -250,7 +250,7 @@ const styles = StyleSheet.create({
   },
   forgotPassword: {
     alignSelf: 'flex-end',
-    marginBottom: 40,
+    marginBottom: 20,
   },
   forgotPasswordText: {
     fontSize: 16,
@@ -262,7 +262,7 @@ const styles = StyleSheet.create({
     borderRadius: 20,
     paddingVertical: 20,
     alignItems: 'center',
-    marginBottom: 40,
+    marginBottom: 20,
   },
   signInButtonText: {
     color: '#FFFFFF',

@@ -100,6 +100,7 @@ export default function LandingScreen() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
+    backgroundColor: '#000F29',
   },
   gradient: {
     flex: 1,
@@ -151,11 +152,11 @@ const styles = StyleSheet.create({
     marginBottom: 60,
   },
   title: {
-    fontSize: 28,
+    fontSize: 35,
     fontWeight: '700',
-    color: '#FFFFFF',
-    textAlign: 'center',
-    lineHeight: 36,
+    color: '#F2F2F2',
+    textAlign: 'left',
+    lineHeight: 50,
   },
   buttonContainer: {
     width: '100%',

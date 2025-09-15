@@ -19,14 +19,12 @@ export default function AppIndex() {
   useEffect(() => {
     if (!isLoading) {
       if (isFirstLaunch) {
-        router.push('/onboarding');
+        router.replace('/onboarding');
       } else if (!isAuthenticated) {
-        router.push('/landing');
+        router.replace('/landing');
       } else {
-        router.push('/landing');
-        // router.push('/(authenticated)/dashboard');
+        router.replace('/(authenticated)/dashboard');
       }
-      // We'll add other routes later
     }
   }, [isLoading, isFirstLaunch, isAuthenticated]);
 
@@ -34,7 +32,6 @@ export default function AppIndex() {
     return <LoadingScreen />;
   }
 
-  // For now, always show onboarding to test
-  //   router.push('/onboarding');
+  // Return loading screen while navigation is happening
   return <LoadingScreen />;
 }
