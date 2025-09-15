@@ -1,11 +1,10 @@
+// app/(authenticated)/dashboard.tsx
 import { Ionicons } from '@expo/vector-icons';
 import { StatusBar } from 'expo-status-bar';
-import React, { useRef, useState } from 'react';
+import React, { useState } from 'react';
 import {
-  Animated,
   Dimensions,
   FlatList,
-  Image,
   Pressable,
   SafeAreaView,
   ScrollView,
@@ -13,10 +12,16 @@ import {
   Text,
   View,
 } from 'react-native';
+import {
+  mockGalleryData,
+  mockNewsData,
+  SliderItem,
+  UniversalSlider,
+} from '../../components/common/UniversalSlider';
 
 const { width: SCREEN_WIDTH } = Dimensions.get('window');
 
-// Mock data
+// Mock data for events (keeping your existing structure)
 const mockEvents = [
   {
     id: '1',
@@ -35,87 +40,69 @@ const mockEvents = [
   },
 ];
 
-const mockGalleryItems = [
+// Mock data for birthdays and new staff (from your figma design)
+const mockBirthdays = [
   {
     id: '1',
-    image: 'https://picsum.photos/300/200?random=1',
-    title: 'Business Forum 2024',
+    name: 'Benson Uwem',
+    department: 'Finance',
+    date: 'August 20',
+    initial: 'B',
   },
   {
     id: '2',
-    image: 'https://picsum.photos/300/200?random=2',
-    title: 'Innovation Summit',
-  },
-  {
-    id: '3',
-    image: 'https://picsum.photos/300/200?random=3',
-    title: 'Technology Workshop',
-  },
-  {
-    id: '4',
-    image: 'https://picsum.photos/300/200?random=4',
-    title: 'Leadership Conference',
+    name: 'John Alade',
+    department: 'QA/QC',
+    date: 'August 20',
+    initial: 'J',
   },
 ];
 
-const mockCarouselData = [
+const mockNewStaff = [
   {
     id: '1',
-    image: 'https://picsum.photos/400/200?random=5',
-    title:
-      'Our MD/CEO, Mrs Adesuwa Lodge, representing Tolaram on a fireside chat at the 13th annual BusinessDay CEO Forum',
+    name: 'Ehis Osariemen',
+    department: 'Operations',
+    initial: 'E',
   },
   {
     id: '2',
-    image: 'https://picsum.photos/400/200?random=6',
-    title:
-      'Lagos Free Zone Annual Innovation Summit showcasing cutting-edge technology solutions',
+    name: 'Chisom Nwoke',
+    department: 'IT',
+    initial: 'C',
   },
   {
     id: '3',
-    image: 'https://picsum.photos/400/200?random=7',
-    title:
-      'Strategic partnership signing ceremony with international investors',
+    name: 'Vanessa Obaze',
+    department: 'Admin',
+    initial: 'V',
   },
+];
+
+const mockHelpfulLinks = [
+  { id: '1', title: 'Environment Management Policy', icon: 'leaf-outline' },
+  { id: '2', title: 'Business Ethics Policy', icon: 'briefcase-outline' },
+  { id: '3', title: 'CSR Policy', icon: 'people-outline' },
+  { id: '4', title: 'OHS Policy', icon: 'shield-checkmark-outline' },
+  { id: '5', title: 'Reports', icon: 'document-text-outline' },
+  { id: '6', title: 'Staff Hand Book', icon: 'book-outline' },
 ];
 
 export default function DashboardScreen() {
-  const [currentCarouselIndex, setCurrentCarouselIndex] = useState(0);
-  const carouselScrollX = useRef(new Animated.Value(0)).current;
-
-  const handleCarouselScroll = Animated.event(
-    [{ nativeEvent: { contentOffset: { x: carouselScrollX } } }],
-    { useNativeDriver: false }
+  const [activeTab, setActiveTab] = useState<'events' | 'updates' | 'links'>(
+    'events'
   );
 
-  const onCarouselMomentumScrollEnd = (event: any) => {
-    const contentOffset = event.nativeEvent.contentOffset.x;
-    const currentIndex = Math.round(contentOffset / SCREEN_WIDTH);
-    setCurrentCarouselIndex(currentIndex);
+  // Handle slider item press
+  const handleNewsPress = (item: SliderItem, index: number) => {
+    console.log('News item pressed:', item.title);
+    // Add your navigation logic here
   };
 
-  const renderCarouselItem = ({ item }: { item: any }) => (
-    <View style={styles.carouselItem}>
-      <Image source={{ uri: item.image }} style={styles.carouselImage} />
-      <View style={styles.carouselOverlay}>
-        <Text style={styles.carouselText}>{item.title}</Text>
-      </View>
-    </View>
-  );
-
-  const renderCarouselDots = () => (
-    <View style={styles.dotsContainer}>
-      {mockCarouselData.map((_, index) => (
-        <View
-          key={index}
-          style={[
-            styles.dot,
-            { opacity: index === currentCarouselIndex ? 1 : 0.3 },
-          ]}
-        />
-      ))}
-    </View>
-  );
+  const handleGalleryPress = (item: SliderItem, index: number) => {
+    console.log('Gallery item pressed:', item.title);
+    // Add your navigation logic here
+  };
 
   const renderEventItem = ({ item }: { item: any }) => (
     <View style={styles.eventItem}>
@@ -127,19 +114,48 @@ export default function DashboardScreen() {
     </View>
   );
 
-  const renderGalleryItem = ({ item }: { item: any }) => (
-    <Pressable style={styles.galleryItem}>
-      <Image source={{ uri: item.image }} style={styles.galleryImage} />
+  const renderBirthdayItem = ({ item }: { item: any }) => (
+    <View style={styles.birthdayItem}>
+      <View style={[styles.avatarCircle, { backgroundColor: '#E3F2FD' }]}>
+        <Text style={styles.avatarText}>{item.initial}</Text>
+      </View>
+      <View style={styles.birthdayContent}>
+        <Text style={styles.birthdayName}>{item.name}</Text>
+        <Text style={styles.birthdayDepartment}>{item.department}</Text>
+        <Text style={styles.birthdayDate}>{item.date}</Text>
+      </View>
+    </View>
+  );
+
+  const renderNewStaffItem = ({ item }: { item: any }) => (
+    <View style={styles.newStaffItem}>
+      <View style={[styles.avatarCircle, { backgroundColor: '#FFF3E0' }]}>
+        <Text style={styles.avatarText}>{item.initial}</Text>
+      </View>
+      <View style={styles.newStaffContent}>
+        <Text style={styles.newStaffName}>{item.name}</Text>
+        <Text style={styles.newStaffDepartment}>{item.department}</Text>
+      </View>
+    </View>
+  );
+
+  const renderHelpfulLinkItem = ({ item }: { item: any }) => (
+    <Pressable style={styles.linkItem}>
+      <View style={styles.linkIconContainer}>
+        <Ionicons name={item.icon as any} size={24} color="#002B82" />
+      </View>
+      <Text style={styles.linkTitle}>{item.title}</Text>
     </Pressable>
   );
 
   const renderQuickActionButton = (
     title: string,
-    subtitle: string,
+    tabKey: 'events' | 'updates' | 'links',
     isActive = false
   ) => (
     <Pressable
       style={[styles.actionButton, isActive && styles.actionButtonActive]}
+      onPress={() => setActiveTab(tabKey)}
     >
       <Text
         style={[
@@ -151,6 +167,65 @@ export default function DashboardScreen() {
       </Text>
     </Pressable>
   );
+
+  const renderTabContent = () => {
+    switch (activeTab) {
+      case 'events':
+        return (
+          <View style={styles.section}>
+            <FlatList
+              data={mockEvents}
+              renderItem={renderEventItem}
+              keyExtractor={(item) => item.id}
+              scrollEnabled={false}
+            />
+          </View>
+        );
+
+      case 'updates':
+        return (
+          <View style={styles.section}>
+            <View style={styles.updatesContainer}>
+              <View style={styles.updateColumn}>
+                <Text style={styles.updateColumnTitle}>Birthdays</Text>
+                <FlatList
+                  data={mockBirthdays}
+                  renderItem={renderBirthdayItem}
+                  keyExtractor={(item) => item.id}
+                  scrollEnabled={false}
+                />
+              </View>
+
+              <View style={styles.updateColumn}>
+                <Text style={styles.updateColumnTitle}>New Staff</Text>
+                <FlatList
+                  data={mockNewStaff}
+                  renderItem={renderNewStaffItem}
+                  keyExtractor={(item) => item.id}
+                  scrollEnabled={false}
+                />
+              </View>
+            </View>
+          </View>
+        );
+
+      case 'links':
+        return (
+          <View style={styles.section}>
+            <View style={styles.linksGrid}>
+              {mockHelpfulLinks.map((item) => (
+                <View key={item.id} style={styles.linkItemWrapper}>
+                  {renderHelpfulLinkItem({ item })}
+                </View>
+              ))}
+            </View>
+          </View>
+        );
+
+      default:
+        return null;
+    }
+  };
 
   return (
     <SafeAreaView style={styles.container}>
@@ -179,20 +254,16 @@ export default function DashboardScreen() {
       </View>
 
       <ScrollView style={styles.content} showsVerticalScrollIndicator={false}>
-        {/* Hero Carousel */}
-        <View style={styles.carouselContainer}>
-          <FlatList
-            data={mockCarouselData}
-            renderItem={renderCarouselItem}
-            keyExtractor={(item) => item.id}
-            horizontal
-            pagingEnabled
-            showsHorizontalScrollIndicator={false}
-            onScroll={handleCarouselScroll}
-            onMomentumScrollEnd={onCarouselMomentumScrollEnd}
-            scrollEventThrottle={16}
+        {/* News Slider */}
+        <View style={styles.newsSection}>
+          <UniversalSlider
+            data={mockNewsData}
+            variant="news"
+            autoPlay={true}
+            autoPlayInterval={5000}
+            showPagination={true}
+            onItemPress={handleNewsPress}
           />
-          {renderCarouselDots()}
         </View>
 
         {/* Quick Actions */}
@@ -202,32 +273,36 @@ export default function DashboardScreen() {
             showsHorizontalScrollIndicator={false}
             contentContainerStyle={styles.quickActionsContent}
           >
-            {renderQuickActionButton('Upcoming Events', '', true)}
-            {renderQuickActionButton('Employee Update', '')}
-            {renderQuickActionButton('Helpful Link', '')}
+            {renderQuickActionButton(
+              'Upcoming Events',
+              'events',
+              activeTab === 'events'
+            )}
+            {renderQuickActionButton(
+              'Employee Updates',
+              'updates',
+              activeTab === 'updates'
+            )}
+            {renderQuickActionButton(
+              'Helpful Links',
+              'links',
+              activeTab === 'links'
+            )}
           </ScrollView>
         </View>
 
-        {/* Upcoming Events */}
-        <View style={styles.section}>
-          <FlatList
-            data={mockEvents}
-            renderItem={renderEventItem}
-            keyExtractor={(item) => item.id}
-            scrollEnabled={false}
-          />
-        </View>
+        {/* Dynamic Tab Content */}
+        {renderTabContent()}
 
         {/* Gallery Section */}
-        <View style={styles.section}>
-          <Text style={styles.sectionTitle}>Gallery</Text>
-          <FlatList
-            data={mockGalleryItems}
-            renderItem={renderGalleryItem}
-            keyExtractor={(item) => item.id}
-            numColumns={2}
-            scrollEnabled={false}
-            columnWrapperStyle={styles.galleryRow}
+        <View style={styles.gallerySection}>
+          <UniversalSlider
+            title="Gallery"
+            data={mockGalleryData}
+            variant="gallery"
+            autoPlay={false}
+            showPagination={false}
+            onItemPress={handleGalleryPress}
           />
         </View>
       </ScrollView>
@@ -238,7 +313,6 @@ export default function DashboardScreen() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-
     backgroundColor: '#002B82',
   },
   content: {
@@ -250,7 +324,6 @@ const styles = StyleSheet.create({
   },
   header: {
     backgroundColor: '#002B82',
-
     borderBottomLeftRadius: 20,
     borderBottomRightRadius: 20,
     paddingHorizontal: 16,
@@ -284,19 +357,6 @@ const styles = StyleSheet.create({
   notificationButton: {
     position: 'relative',
   },
-  profileAvatar: {
-    width: 40,
-    height: 40,
-    borderRadius: 20,
-    backgroundColor: 'rgba(255, 255, 255, 0.2)',
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  profileInitials: {
-    color: '#FFFFFF',
-    fontSize: 16,
-    fontWeight: '600',
-  },
   notificationBadge: {
     position: 'absolute',
     top: -2,
@@ -313,55 +373,13 @@ const styles = StyleSheet.create({
     fontSize: 12,
     fontWeight: 'bold',
   },
-  carouselContainer: {
-    height: 200,
-    marginBottom: 20,
-    paddingHorizontal: 16,
+
+  // News Section
+  newsSection: {
+    paddingTop: 20,
   },
-  carouselContent: {
-    paddingHorizontal: 0,
-  },
-  carouselItem: {
-    height: 200,
-    position: 'relative',
-    borderRadius: 12,
-    overflow: 'hidden',
-    marginHorizontal: 2,
-  },
-  carouselImage: {
-    width: '100%',
-    height: '100%',
-    resizeMode: 'cover',
-  },
-  carouselOverlay: {
-    position: 'absolute',
-    bottom: 0,
-    left: 0,
-    right: 0,
-    backgroundColor: 'rgba(0, 0, 0, 0.6)',
-    padding: 16,
-  },
-  carouselText: {
-    color: '#FFFFFF',
-    fontSize: 14,
-    fontWeight: '500',
-    lineHeight: 18,
-  },
-  dotsContainer: {
-    position: 'absolute',
-    bottom: 50,
-    left: 0,
-    right: 0,
-    flexDirection: 'row',
-    justifyContent: 'center',
-    alignItems: 'center',
-  },
-  dot: {
-    height: 8,
-    borderRadius: 4,
-    backgroundColor: '#FFFFFF',
-    marginHorizontal: 4,
-  },
+
+  // Quick Actions
   quickActionsContainer: {
     marginBottom: 20,
     paddingHorizontal: 16,
@@ -392,6 +410,8 @@ const styles = StyleSheet.create({
   actionButtonTextActive: {
     color: '#FFFFFF',
   },
+
+  // Sections
   section: {
     backgroundColor: '#FFFFFF',
     marginHorizontal: 16,
@@ -399,12 +419,8 @@ const styles = StyleSheet.create({
     borderRadius: 12,
     padding: 16,
   },
-  sectionTitle: {
-    fontSize: 18,
-    fontWeight: '700',
-    color: '#1F2937',
-    marginBottom: 16,
-  },
+
+  // Events
   eventItem: {
     flexDirection: 'row',
     alignItems: 'flex-start',
@@ -432,22 +448,124 @@ const styles = StyleSheet.create({
     color: '#292929',
     lineHeight: 20,
   },
-  galleryContent: {
-    paddingRight: 16,
+
+  // Updates Section
+  updatesContainer: {
+    flexDirection: 'row',
+    gap: 20,
   },
-  galleryItem: {
-    width: 180,
-    height: 120,
-    borderRadius: 8,
-    overflow: 'hidden',
+  updateColumn: {
+    flex: 1,
   },
-  galleryImage: {
-    width: '100%',
-    height: '100%',
-    resizeMode: 'cover',
-  },
-  galleryRow: {
-    justifyContent: 'space-between',
+  updateColumnTitle: {
+    fontSize: 16,
+    fontWeight: '700',
+    color: '#1F2937',
     marginBottom: 12,
+  },
+
+  // Birthdays
+  birthdayItem: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginBottom: 12,
+  },
+  birthdayContent: {
+    marginLeft: 12,
+    flex: 1,
+  },
+  birthdayName: {
+    fontSize: 14,
+    fontWeight: '600',
+    color: '#1F2937',
+  },
+  birthdayDepartment: {
+    fontSize: 12,
+    color: '#6B7280',
+    marginTop: 2,
+  },
+  birthdayDate: {
+    fontSize: 12,
+    color: '#6B7280',
+    marginTop: 2,
+  },
+
+  // New Staff
+  newStaffItem: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginBottom: 12,
+  },
+  newStaffContent: {
+    marginLeft: 12,
+    flex: 1,
+  },
+  newStaffName: {
+    fontSize: 14,
+    fontWeight: '600',
+    color: '#1F2937',
+  },
+  newStaffDepartment: {
+    fontSize: 12,
+    color: '#6B7280',
+    marginTop: 2,
+  },
+
+  // Avatar Circle (shared for birthdays and new staff)
+  avatarCircle: {
+    width: 36,
+    height: 36,
+    borderRadius: 18,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  avatarText: {
+    fontSize: 16,
+    fontWeight: '600',
+    color: '#002B82',
+  },
+
+  // Helpful Links
+  linksGrid: {
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    gap: 16,
+  },
+  linkItemWrapper: {
+    width: '30%',
+    minWidth: 90,
+  },
+  linkItem: {
+    alignItems: 'center',
+    padding: 12,
+    backgroundColor: '#F8F9FA',
+    borderRadius: 8,
+    minHeight: 80,
+    justifyContent: 'center',
+  },
+  linkIconContainer: {
+    width: 36,
+    height: 36,
+    borderRadius: 18,
+    backgroundColor: '#E3F2FD',
+    alignItems: 'center',
+    justifyContent: 'center',
+    marginBottom: 8,
+  },
+  linkTitle: {
+    fontSize: 10,
+    fontWeight: '500',
+    color: '#1F2937',
+    textAlign: 'center',
+    lineHeight: 12,
+  },
+
+  // Gallery Section
+  gallerySection: {
+    backgroundColor: '#FFFFFF',
+    marginHorizontal: 16,
+    marginBottom: 20,
+    borderRadius: 12,
+    paddingVertical: 16,
   },
 });
